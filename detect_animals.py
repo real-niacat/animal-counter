@@ -2,7 +2,7 @@ import argparse
 import jetson_utils
 import jetson_inference
 # written by human(s?)
-# for humans
+# for humans(?)
 
 parser = argparse.ArgumentParser(description="Takes an image or webcam input and detects if there are multiple animals in it.",
                                  usage="Usage: python detect_animals.py [camera|image <image_path>]")
@@ -10,7 +10,14 @@ parser = argparse.ArgumentParser(description="Takes an image or webcam input and
 parser.add_argument("inputtype", type=str, default="", nargs="?", help="Webcam or from image file")
 parser.add_argument("input", type=str, default="", nargs="?", help="Input destination")
 
+def print_by_animals(animalcount):
+    print(f"There are {animalcount} animals in this image")
+    if animalcount > 1:
+        print("THERE ARE TOO MANY ANIMALS!!!!!!")
+        #in a world where 2 animals is not permitted in one picture
+        # i made this progra m
 
+# this code feels cramped
 inp = None
 setting = None
 pka = parser.parse_known_args()[0]
@@ -21,7 +28,8 @@ animals = ["person", "bird", "cat", "dog", "horse", "sheep", "cow", "elephant", 
 # yes. people are animals
 if setting == "image" or setting == "camera":
     detect = jetson_inference.detectNet(model="ssd-mobilenet-v2",threshold=0.5)
-    #to be fully honest with you it isn't so good at detecting images all the time, but i can't really make the model better on its own
+    #could have done this a better way however i dont feel like it
+    # this also isnt super good at detecting but i don't have the time to train a better model for all of these animals
 if setting == "image":
     print("Running on " + inp)
     
@@ -40,8 +48,7 @@ if setting == "image":
             # i have nothing else to say
             animalcount += 1
         
-    if animalcount > 1:
-        print(f"There are {animalcount} animals in this image, which is too many.")
+    print_by_animals(animalcount)
 elif setting == "camera":
     
     camera = jetson_utils.videoSource("/dev/video0")
@@ -57,11 +64,7 @@ elif setting == "camera":
             if desc in animals:
                 animalcount += 1
             
-        if animalcount > 1:
-            print(f"Detected {animalcount} animals, !!!!!!!!")
-        else:
-            print(f"Detected {animalcount} animals, you're fine.")
-
+        print_by_animals(animalcount)
         video.SetStatus(f"{animalcount} animals found!")
     
 else:
